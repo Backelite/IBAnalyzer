@@ -20,9 +20,16 @@ struct Violation {
     
     var filePath : String {
         if let path = url?.absoluteString {
-            return path.replacingOccurrences(of: "file://", with: "")
+            return path.replacingOccurrences(of: "file://", with: "").replacingOccurrences(of: "%20", with: " ")
         }
         return name
+    }
+    
+    func fileName(className: String) -> String {
+        if let filename = url?.lastPathComponent {
+            return filename
+        }
+        return className
     }
 }
 
@@ -41,13 +48,13 @@ enum ConnectionIssue: Issue {
     var description: String {
         switch self {
         case let .MissingOutlet(className: className, outlet: outlet):            
-            return "\(outlet.description): warning: IBOutlet not implemented: \(outlet.name) is not implemented in \(className)"
+            return "\(outlet.description): warning: IBOutlet missing: \(outlet.name) is not implemented in \(outlet.fileName(className: className))"
         case let .MissingAction(className: className, action: action):
-            return "\(action.description): warning: IBAction not implemented: \(action.name) is not implemented in \(className)"
+            return "\(action.description): warning: IBAction missing: \(action.name) is not implemented in \(action.fileName(className: className))"
         case let .UnnecessaryOutlet(className: className, outlet: outlet):
-            return "\(outlet.description): warning: IBOutlet unused: \(outlet.name) not linked in \(className)"
+            return "\(outlet.description): warning: IBOutlet unused: \(outlet.name) not linked in \(outlet.fileName(className: className))"
         case let .UnnecessaryAction(className: className, action: action):
-            return "\(action.description): warning: IBAction unused: \(action.name) not linked in \(className)"
+            return "\(action.description): warning: IBAction unused: \(action.name) not linked in \(action.fileName(className: className))"
         }
     }
 }
