@@ -20,7 +20,11 @@ class NibParserTests: XCTestCase {
         let storyboardPath = (srcRoot as NSString).appendingPathComponent(path)
         let url = URL(fileURLWithPath: storyboardPath)
         let parser = NibParser()
-        let expected = ["ViewController": Nib(outlets: ["button", "titleLabel"], actions: ["didTapButton:"]),
+        
+        let button = Violation(name: "button", line: 1, column: 0, url: nil)
+        let titleLabel = Violation(name: "titleLabel", line: 1, column: 0, url: nil)
+        let didTapButton = Violation(name: "didTapButton:", line: 1, column: 0, url: nil)
+        let expected = ["ViewController": Nib(outlets: [button, titleLabel], actions: [didTapButton]),
              "ViewController2": Nib(outlets: [], actions: [])]
         do {
             let result = try parser.mappingForFile(at: url)

@@ -24,9 +24,15 @@ struct StubThrowingDirectoryContentsEnumerator: DirectoryContentsEnumeratorType 
 }
 
 struct StubNibParser: NibParserType {
-    static let cMap = ["C": Nib(outlets: ["label", "button"], actions: [])]
-    static let dMap = ["FirstViewController": Nib(outlets: [], actions: ["tappedButton:"]),
-                       "SecondViewController": Nib(outlets: ["titleView"], actions: [])]
+    static let button = Violation(name: "button", line: 1, column: 0, url: nil)
+    static let label = Violation(name: "label", line: 1, column: 0, url: nil)
+    
+    static let cMap = ["C": Nib(outlets: [StubNibParser.label, StubNibParser.button], actions: [])]
+    
+    static let tappedButton = Violation(name: "tappedButton:", line: 1, column: 0, url: nil)
+    static let titleView = Violation(name: "titleView", line: 1, column: 0, url: nil)
+    static let dMap = ["FirstViewController": Nib(outlets: [], actions: [StubNibParser.tappedButton]),
+                       "SecondViewController": Nib(outlets: [StubNibParser.titleView], actions: [])]
 
     func mappingForFile(at url: URL) throws -> [String : Nib] {
         switch url {
@@ -41,8 +47,11 @@ struct StubNibParser: NibParserType {
 }
 
 struct StubSwiftParser: SwiftParserType {
-    static let aMap = ["C": Class(outlets: ["label"], actions: [], inherited: [])]
-    static let eMap = ["FirstViewController": Class(outlets: [], actions: ["buttonTapped:"], inherited: [])]
+    static let label = Violation(name: "label", line: 1, column: 0, url: nil)
+    static let aMap = ["C": Class(outlets: [StubSwiftParser.label], actions: [], inherited: [])]
+    
+    static let buttonTapped = Violation(name: "buttonTapped:", line: 1, column: 0, url: nil)
+    static let eMap = ["FirstViewController": Class(outlets: [], actions: [StubSwiftParser.buttonTapped], inherited: [])]
 
     func mappingForFile(at url: URL) throws -> [String: Class] {
         switch url {

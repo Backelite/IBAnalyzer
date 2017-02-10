@@ -11,7 +11,6 @@ import Foundation
 struct Nib {
     var outlets: [Violation]
     var actions: [Violation]
-    var filePaths: [String]
 }
 
 extension Nib: Equatable {

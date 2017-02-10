@@ -75,7 +75,7 @@ private class ParserDelegate: NSObject, XMLParserDelegate {
 
             if let customClass = customClass, let id = id {
                 idToCustomClassMap[id] = customClass
-                classNameToNibMap[customClass] = Nib(outlets: [], actions: [], filePaths: [])
+                classNameToNibMap[customClass] = Nib(outlets: [], actions: [])
             }
         default:
             break
