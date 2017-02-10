@@ -9,8 +9,8 @@
 import Foundation
 
 struct Class {
-    var outlets: [String]
-    var actions: [String]
+    var outlets: [Violation]
+    var actions: [Violation]
     var inherited: [String]
 }
 

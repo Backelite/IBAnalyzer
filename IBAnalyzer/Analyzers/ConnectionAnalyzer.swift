@@ -8,22 +8,46 @@
 
 import Foundation
 
-enum ConnectionIssue: Issue {
-    case MissingOutlet(className: String, outlet: String)
-    case MissingAction(className: String, action: String)
-    case UnnecessaryOutlet(className: String, outlet: String)
-    case UnnecessaryAction(className: String, action: String)
+struct Violation {
+    var name: String
+    var line: Int
+    var column: Int
+    var url: URL?
+    
+    var description: String {
+        return filePath+":\(line):\(column)"
+    }
+    
+    var filePath : String {
+        if let path = url?.absoluteString {
+            return path.replacingOccurrences(of: "file://", with: "")
+        }
+        return name
+    }
+}
 
+extension Violation: Equatable {
+    public static func == (lhs: Violation, rhs: Violation) -> Bool {
+        return lhs.name == rhs.name
+    }
+}
+
+enum ConnectionIssue: Issue {
+    case MissingOutlet(className: String, outlet: Violation)
+    case MissingAction(className: String, action: Violation)
+    case UnnecessaryOutlet(className: String, outlet: Violation)
+    case UnnecessaryAction(className: String, action: Violation)
+    
     var description: String {
         switch self {
-        case let .MissingOutlet(className: className, outlet: outlet):
-            return "\(className) doesn't implement a required @IBOutlet named: \(outlet)"
+        case let .MissingOutlet(className: className, outlet: outlet):            
+            return "\(outlet.description): warning: IBOutlet not implemented: \(outlet.name) is not implemented in \(className)"
         case let .MissingAction(className: className, action: action):
-            return "\(className) doesn't implement a required @IBAction named: \(action)"
+            return "\(action.description): warning: IBAction not implemented: \(action.name) is not implemented in \(className)"
         case let .UnnecessaryOutlet(className: className, outlet: outlet):
-            return "\(className) contains unused @IBOutlet named: \(outlet)"
+            return "\(outlet.description): warning: IBOutlet unused: \(outlet.name) not linked in \(className)"
         case let .UnnecessaryAction(className: className, action: action):
-            return "\(className) contains unused @IBAction named: \(action)"
+            return "\(action.description): warning: IBAction unused: \(action.name) not linked in \(className)"
         }
     }
 }

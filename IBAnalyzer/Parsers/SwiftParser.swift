@@ -36,15 +36,16 @@ class SwiftParser: SwiftParserType {
         let dictionary = fileStructure.dictionary
 
         var result: [String: Class] = [:]
-        parseSubstructure(dictionary.substructure, result: &result)
+        parseSubstructure(dictionary.substructure, result: &result, file: file)
         return result
     }
 
     private func parseSubstructure(_ substructure: [[String : SourceKitRepresentable]],
-                                   result: inout [String: Class]) {
+                                   result: inout [String: Class],
+                                   file: File) {
         for structure in substructure {
-            var outlets: [String] = []
-            var actions: [String] = []
+            var outlets: [Violation] = []
+            var actions: [Violation] = []
 
             if let kind = structure["key.kind"] as? String,
                 let name = structure["key.name"] as? String,
@@ -58,21 +59,25 @@ class SwiftParser: SwiftParserType {
                             return dict.values.contains("source.decl.attribute.iboutlet")
                         }).count > 0
 
-                        if isOutlet {
-                            outlets.append(name)
+                        
+                        if isOutlet, let nameOffset64 = insideStructure["key.nameoffset"] as? Int64 {
+                            let fileOffset = getLineColumnNumber(of: file, offset: Int(nameOffset64))
+                            
+                            outlets.append(Violation(name: name, line: fileOffset.line, column: fileOffset.column, url:URL(string: file.path!)))
                         }
 
                         let isIBAction = attributes.filter({ (dict) -> Bool in
                             return dict.values.contains("source.decl.attribute.ibaction")
                         }).count > 0
 
-                        if isIBAction, let selectorName = insideStructure["key.selector_name"] as? String {
-                            actions.append(selectorName)
+                        if isIBAction, let selectorName = insideStructure["key.selector_name"] as? String, let nameOffset64 = insideStructure["key.nameoffset"] as? Int64 {
+                            let fileOffset = getLineColumnNumber(of: file, offset: Int(nameOffset64))
+                            actions.append(Violation(name: selectorName, line: fileOffset.line, column: fileOffset.column, url:URL(string: file.path!)))
                         }
                     }
                 }
 
-                parseSubstructure(structure.substructure, result: &result)
+                parseSubstructure(structure.substructure, result: &result, file: file)
                 let inherited = extractedInheritedTypes(structure: structure)
                 let existing = result[name]
 
@@ -82,6 +87,17 @@ class SwiftParser: SwiftParserType {
                                               inherited: inherited + (existing?.inherited ?? []))
             }
         }
+    }
+    
+    func getLineColumnNumber(of file: File, offset: Int) -> (line: Int, column: Int) {
+        let range = file.contents.startIndex..<file.contents.index(file.contents.startIndex, offsetBy: offset)
+        let subString = file.contents.substring(with: range)
+        let lines = subString.components(separatedBy: "\n")
+
+        if let column = lines.last?.characters.count {
+            return (line: lines.count, column: column)
+        }
+        return (line: lines.count, column: 0)
     }
 
     private func extractedInheritedTypes(structure: [String : SourceKitRepresentable]) -> [String] {
