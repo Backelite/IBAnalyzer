@@ -10,8 +10,8 @@ import Foundation
 import SourceKittenFramework
 
 protocol SwiftParserType {
-    func mappingForFile(at url: URL) throws -> [String: Class]
-    func mappingForContents(_ contents: String) -> [String: Class]
+    func mappingForFile(at url: URL, result: inout [String: Class]) throws
+    func mappingForContents(_ contents: String, result: inout [String: Class])
 }
 
 enum SwiftParserError: Error {
@@ -19,25 +19,23 @@ enum SwiftParserError: Error {
 }
 
 class SwiftParser: SwiftParserType {
-    func mappingForFile(at url: URL) throws -> [String: Class] {
+    func mappingForFile(at url: URL, result: inout [String: Class]) throws {
         if let file = File(path: url.path) {
-            return mapping(for: file)
+            return mapping(for: file, result: &result)
         } else {
             throw SwiftParserError.incorrectPath(path: url.path)
         }
     }
 
-    func mappingForContents(_ contents: String) -> [String: Class] {
-        return mapping(for: File(contents: contents))
+    func mappingForContents(_ contents: String, result: inout [String: Class]) {
+        return mapping(for: File(contents: contents), result: &result)
     }
 
-    private func mapping(for file: File) -> [String: Class] {
+    private func mapping(for file: File, result: inout [String: Class]) {
         let fileStructure = Structure(file: file)
         let dictionary = fileStructure.dictionary
 
-        var result: [String: Class] = [:]
         parseSubstructure(dictionary.substructure, result: &result, file: file)
-        return result
     }
 
     private func parseSubstructure(_ substructure: [[String : SourceKitRepresentable]],

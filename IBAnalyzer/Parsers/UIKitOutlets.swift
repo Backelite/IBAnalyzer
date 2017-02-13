@@ -34,7 +34,8 @@ private let uiKitOutlets: [String: [String]] = [
     "UINavigationItem": ["backBarButtonItem", "leftBarButtonItem", "rightBarButtonItem", "titleView"],
     "UIToolbar": ["delegate"],
     "UITabBar": ["delegate"],
-    "UISearchBar": ["delegate"]
+    "UISearchBar": ["delegate"],
+    "UIViewController": ["view"]
 ]
 
 func uiKitClassNameToClass() -> [String: Class] {
