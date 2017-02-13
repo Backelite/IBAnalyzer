@@ -59,7 +59,10 @@ class SwiftParser: SwiftParserType {
 
                         if isOutlet, let nameOffset64 = insideStructure["key.nameoffset"] as? Int64 {
                             let fileOffset = getLineColumnNumber(of: file, offset: Int(nameOffset64))
-                            let url = URL(string: file.path!)
+                            var url: URL?
+                            if let path = file.path {
+                                url = URL(string: path)
+                            }
                             let violation = Violation(name: name, line: fileOffset.line, column: fileOffset.column, url: url)
                             outlets.append(violation)
                         }
@@ -71,7 +74,10 @@ class SwiftParser: SwiftParserType {
                         if isIBAction, let selectorName = insideStructure["key.selector_name"] as? String,
                             let nameOffset64 = insideStructure["key.nameoffset"] as? Int64 {
                             let fileOffset = getLineColumnNumber(of: file, offset: Int(nameOffset64))
-                            let url = URL(string: file.path!)
+                            var url: URL?
+                            if let path = file.path {
+                                url = URL(string: path)
+                            }
                             let violation = Violation(name: selectorName, line: fileOffset.line, column: fileOffset.column, url: url)
                             actions.append(violation)
                         }

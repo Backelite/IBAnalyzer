@@ -15,7 +15,6 @@ struct Nib {
 
 extension Nib: Equatable {
     public static func == (lhs: Nib, rhs: Nib) -> Bool {
-        return lhs.outlets.isEqualTo(rhs.outlets) && lhs.actions.isEqualTo(rhs.actions)
-        //return lhs.outlets == rhs.outlets && lhs.actions == rhs.actions
+        return lhs.outlets == rhs.outlets && lhs.actions == rhs.actions
     }
 }

@@ -21,17 +21,17 @@ class SwiftParserTests: XCTestCase {
     }
 
     func testViewControllerWithOneOutlet() {
-        let source = "class TestViewController: UIViewController { @IBOutlet weak var button: UIButton!; }"
-        let button = Violation(name: "name", line: 1, column: 0, url: nil)
+        let source = "class TestViewController: UIViewController { @IBOutlet weak var button: UIButton! }"
+        let button = Violation(name: "button", line: 1, column: 0, url: nil)
         let expected = Class(outlets: [button], actions: [], inherited: ["UIViewController"])
         XCTAssertEqual(mappingFor(contents: source), ["TestViewController": expected])
     }
 
     func testNestedViewControllerWithOneOutlet() {
-        let source = "class Outer { class TestViewController: UIViewController { @IBOutlet weak var button: UIButton!; }}"
+        let source = "class Outer { class TestViewController: UIViewController { @IBOutlet weak var button: UIButton! }}"
 
         let expectedOuter = Class(outlets: [], actions: [], inherited: [])
-        let button = Violation(name: "name", line: 1, column: 0, url: nil)
+        let button = Violation(name: "button", line: 1, column: 0, url: nil)
         let expectedInner = Class(outlets: [button], actions: [], inherited: ["UIViewController"])
         XCTAssertEqual(mappingFor(contents: source), ["Outer": expectedOuter,
                                           "TestViewController": expectedInner])
@@ -62,6 +62,8 @@ class SwiftParserTests: XCTestCase {
 
     private func mappingFor(contents: String) -> [String: Class] {
         let parser = SwiftParser()
-        return parser.mappingForContents(contents)
+        var result: [String: Class] = [:]
+        parser.mappingForContents(contents, result: &result)
+        return result
     }
 }

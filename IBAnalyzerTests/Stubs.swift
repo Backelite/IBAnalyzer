@@ -50,18 +50,26 @@ struct StubSwiftParser: SwiftParserType {
     static let buttonTapped = Violation(name: "buttonTapped:", line: 1, column: 0, url: nil)
     static let eMap = ["FirstViewController": Class(outlets: [], actions: [StubSwiftParser.buttonTapped], inherited: [])]
 
-    func mappingForFile(at url: URL) throws -> [String: Class] {
+    func mappingForFile(at url: URL, result: inout [String: Class]) throws {
         switch url {
         case URL(fileURLWithPath: "a.swift"):
-            return type(of: self).aMap
+            result += type(of: self).aMap
+            //return type(of: self).aMap
         case URL(fileURLWithPath: "e.swift"):
-            return type(of: self).eMap
+            result += type(of: self).eMap
+            //return type(of: self).eMap
         default:
             fatalError()
         }
     }
 
-    func mappingForContents(_ contents: String) -> [String: Class] {
-        return [:]
+    func mappingForContents(_ contents: String, result: inout [String: Class]) {
+        //do nothing
     }
 }
+
+    func += <K, V> (left: inout [K: V], right: [K: V]) {
+        for (k, v) in right {
+            left.updateValue(v, forKey: k)
+        }
+    }
