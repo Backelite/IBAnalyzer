@@ -22,7 +22,6 @@ class SwiftParserTests: XCTestCase {
 
     func testViewControllerWithOneOutlet() {
         let source = "class TestViewController: UIViewController { @IBOutlet weak var button: UIButton!; }"
-        
         let button = Violation(name: "name", line: 1, column: 0, url: nil)
         let expected = Class(outlets: [button], actions: [], inherited: ["UIViewController"])
         XCTAssertEqual(mappingFor(contents: source), ["TestViewController": expected])
@@ -32,7 +31,6 @@ class SwiftParserTests: XCTestCase {
         let source = "class Outer { class TestViewController: UIViewController { @IBOutlet weak var button: UIButton!; }}"
 
         let expectedOuter = Class(outlets: [], actions: [], inherited: [])
-        
         let button = Violation(name: "name", line: 1, column: 0, url: nil)
         let expectedInner = Class(outlets: [button], actions: [], inherited: ["UIViewController"])
         XCTAssertEqual(mappingFor(contents: source), ["Outer": expectedOuter,

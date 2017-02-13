@@ -34,7 +34,7 @@ private class ParserDelegate: NSObject, XMLParserDelegate {
         let customClassName: String?
     }
 
-    var url:URL!
+    var url: URL!
     var inObjects = false
     var inConnections = false
     private var stack: [Element] = []
@@ -57,7 +57,7 @@ private class ParserDelegate: NSObject, XMLParserDelegate {
                 let customClassName = stack.last?.customClassName else {
                     break
             }
-            
+
             let outlet = Violation(name: property, line: parser.lineNumber, column: parser.columnNumber, url: url)
             classNameToNibMap[customClassName]?.outlets.append(outlet)
         case "action" where inConnections:

@@ -59,20 +59,23 @@ class SwiftParser: SwiftParserType {
                             return dict.values.contains("source.decl.attribute.iboutlet")
                         }).count > 0
 
-                        
                         if isOutlet, let nameOffset64 = insideStructure["key.nameoffset"] as? Int64 {
                             let fileOffset = getLineColumnNumber(of: file, offset: Int(nameOffset64))
-                            
-                            outlets.append(Violation(name: name, line: fileOffset.line, column: fileOffset.column, url:URL(string: file.path!)))
+                            let url = URL(string: file.path!)
+                            let violation = Violation(name: name, line: fileOffset.line, column: fileOffset.column, url: url)
+                            outlets.append(violation)
                         }
 
                         let isIBAction = attributes.filter({ (dict) -> Bool in
                             return dict.values.contains("source.decl.attribute.ibaction")
                         }).count > 0
 
-                        if isIBAction, let selectorName = insideStructure["key.selector_name"] as? String, let nameOffset64 = insideStructure["key.nameoffset"] as? Int64 {
+                        if isIBAction, let selectorName = insideStructure["key.selector_name"] as? String,
+                            let nameOffset64 = insideStructure["key.nameoffset"] as? Int64 {
                             let fileOffset = getLineColumnNumber(of: file, offset: Int(nameOffset64))
-                            actions.append(Violation(name: selectorName, line: fileOffset.line, column: fileOffset.column, url:URL(string: file.path!)))
+                            let url = URL(string: file.path!)
+                            let violation = Violation(name: selectorName, line: fileOffset.line, column: fileOffset.column, url: url)
+                            actions.append(violation)
                         }
                     }
                 }
@@ -88,7 +91,7 @@ class SwiftParser: SwiftParserType {
             }
         }
     }
-    
+
     func getLineColumnNumber(of file: File, offset: Int) -> (line: Int, column: Int) {
         let range = file.contents.startIndex..<file.contents.index(file.contents.startIndex, offsetBy: offset)
         let subString = file.contents.substring(with: range)

@@ -13,18 +13,18 @@ struct Violation {
     var line: Int
     var column: Int
     var url: URL?
-    
+
     var description: String {
         return filePath+":\(line):\(column)"
     }
-    
-    var filePath : String {
+
+    var filePath: String {
         if let path = url?.absoluteString {
             return path.replacingOccurrences(of: "file://", with: "").replacingOccurrences(of: "%20", with: " ")
         }
         return name
     }
-    
+
     func fileName(className: String) -> String {
         if let filename = url?.lastPathComponent {
             return filename
@@ -44,10 +44,10 @@ enum ConnectionIssue: Issue {
     case MissingAction(className: String, action: Violation)
     case UnnecessaryOutlet(className: String, outlet: Violation)
     case UnnecessaryAction(className: String, action: Violation)
-    
+
     var description: String {
         switch self {
-        case let .MissingOutlet(className: className, outlet: outlet):            
+        case let .MissingOutlet(className: className, outlet: outlet):
             return "\(outlet.description): warning: IBOutlet missing: \(outlet.name) is not implemented in \(outlet.fileName(className: className))"
         case let .MissingAction(className: className, action: action):
             return "\(action.description): warning: IBAction missing: \(action.name) is not implemented in \(action.fileName(className: className))"
