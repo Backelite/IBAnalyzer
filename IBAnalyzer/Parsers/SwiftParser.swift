@@ -58,13 +58,7 @@ class SwiftParser: SwiftParserType {
                         }).count > 0
 
                         if isOutlet, let nameOffset64 = insideStructure["key.nameoffset"] as? Int64 {
-                            let fileOffset = getLineColumnNumber(of: file, offset: Int(nameOffset64))
-                            var url: URL?
-                            if let path = file.path {
-                                url = URL(string: path)
-                            }
-                            let violation = Violation(name: name, line: fileOffset.line, column: fileOffset.column, url: url)
-                            outlets.append(violation)
+                            outlets.append(violation(for: name, file: file, offset: nameOffset64))
                         }
 
                         let isIBAction = attributes.filter({ (dict) -> Bool in
@@ -73,13 +67,7 @@ class SwiftParser: SwiftParserType {
 
                         if isIBAction, let selectorName = insideStructure["key.selector_name"] as? String,
                             let nameOffset64 = insideStructure["key.nameoffset"] as? Int64 {
-                            let fileOffset = getLineColumnNumber(of: file, offset: Int(nameOffset64))
-                            var url: URL?
-                            if let path = file.path {
-                                url = URL(string: path)
-                            }
-                            let violation = Violation(name: selectorName, line: fileOffset.line, column: fileOffset.column, url: url)
-                            actions.append(violation)
+                            actions.append(violation(for: selectorName, file: file, offset: nameOffset64))
                         }
                     }
                 }
@@ -96,7 +84,16 @@ class SwiftParser: SwiftParserType {
         }
     }
 
-    func getLineColumnNumber(of file: File, offset: Int) -> (line: Int, column: Int) {
+    private func violation(for name: String, file: File, offset: Int64) -> Violation {
+        let fileOffset = getLineColumnNumber(of: file, offset: Int(offset))
+        var url: URL?
+        if let path = file.path {
+            url = URL(string: path)
+        }
+        return Violation(name: name, line: fileOffset.line, column: fileOffset.column, url: url)
+    }
+
+    private func getLineColumnNumber(of file: File, offset: Int) -> (line: Int, column: Int) {
         let range = file.contents.startIndex..<file.contents.index(file.contents.startIndex, offsetBy: offset)
         let subString = file.contents.substring(with: range)
         let lines = subString.components(separatedBy: "\n")
