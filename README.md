@@ -73,7 +73,7 @@ if [ "${CONFIGURATION}" = "Analyze" ]; then
     if which ibanalyzer >/dev/null; then
         ibanalyzer
     else
-        echo "warning: SwiftLint not installed, download from https://github.com/fastred/IBAnalyzer"
+        echo "warning: IBAnalyzer not installed, download from https://github.com/fastred/IBAnalyzer"
     fi
 fi ```
 1. Product > Analyze
