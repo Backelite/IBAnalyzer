@@ -24,11 +24,11 @@ struct StubThrowingDirectoryContentsEnumerator: DirectoryContentsEnumeratorType 
 }
 
 struct StubNibParser: NibParserType {
-    static let button = Violation(name: "button", line: 1, column: 0, url: nil)
-    static let label = Violation(name: "label", line: 1, column: 0, url: nil)
+    static let button = Violation(name: "button", line: 1, column: 0)
+    static let label = Violation(name: "label", line: 1, column: 0)
     static let cMap = ["C": Nib(outlets: [StubNibParser.label, StubNibParser.button], actions: [])]
-    static let tappedButton = Violation(name: "tappedButton:", line: 1, column: 0, url: nil)
-    static let titleView = Violation(name: "titleView", line: 1, column: 0, url: nil)
+    static let tappedButton = Violation(name: "tappedButton:", line: 1, column: 0)
+    static let titleView = Violation(name: "titleView", line: 1, column: 0)
     static let dMap = ["FirstViewController": Nib(outlets: [], actions: [StubNibParser.tappedButton]),
                        "SecondViewController": Nib(outlets: [StubNibParser.titleView], actions: [])]
 
@@ -45,9 +45,9 @@ struct StubNibParser: NibParserType {
 }
 
 struct StubSwiftParser: SwiftParserType {
-    static let label = Violation(name: "label", line: 1, column: 0, url: nil)
+    static let label = Violation(name: "label", line: 1, column: 0)
     static let aMap = ["C": Class(outlets: [StubSwiftParser.label], actions: [], inherited: [])]
-    static let buttonTapped = Violation(name: "buttonTapped:", line: 1, column: 0, url: nil)
+    static let buttonTapped = Violation(name: "buttonTapped:", line: 1, column: 0)
     static let eMap = ["FirstViewController": Class(outlets: [], actions: [StubSwiftParser.buttonTapped], inherited: [])]
 
     func mappingForFile(at url: URL, result: inout [String: Class]) throws {
@@ -68,8 +68,8 @@ struct StubSwiftParser: SwiftParserType {
     }
 }
 
-    func += <K, V> (left: inout [K: V], right: [K: V]) {
-        for (k, v) in right {
-            left.updateValue(v, forKey: k)
-        }
+func += <K, V> (left: inout [K: V], right: [K: V]) {
+    for (k, v) in right {
+        left.updateValue(v, forKey: k)
     }
+}

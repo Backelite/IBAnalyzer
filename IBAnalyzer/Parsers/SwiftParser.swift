@@ -51,14 +51,14 @@ class SwiftParser: SwiftParserType {
 
                 for insideStructure in structure.substructure {
                     if let attributes = insideStructure["key.attributes"] as? [[String: String]],
-                        let name = insideStructure["key.name"] as? String {
+                        let propertyName = insideStructure["key.name"] as? String {
 
                         let isOutlet = attributes.filter({ (dict) -> Bool in
                             return dict.values.contains("source.decl.attribute.iboutlet")
                         }).count > 0
 
                         if isOutlet, let nameOffset64 = insideStructure["key.nameoffset"] as? Int64 {
-                            outlets.append(violation(for: name, file: file, offset: nameOffset64))
+                            outlets.append(Violation(name: propertyName, file: file, offset: nameOffset64, isOptional: insideStructure.isOptional))
                         }
 
                         let isIBAction = attributes.filter({ (dict) -> Bool in
@@ -67,7 +67,7 @@ class SwiftParser: SwiftParserType {
 
                         if isIBAction, let selectorName = insideStructure["key.selector_name"] as? String,
                             let nameOffset64 = insideStructure["key.nameoffset"] as? Int64 {
-                            actions.append(violation(for: selectorName, file: file, offset: nameOffset64))
+                            actions.append(Violation(name: selectorName, file: file, offset: nameOffset64))
                         }
                     }
                 }
@@ -76,32 +76,12 @@ class SwiftParser: SwiftParserType {
                 let inherited = extractedInheritedTypes(structure: structure)
                 let existing = result[name]
 
-                // appending needed becauase of extensions
+                // appending needed because of extensions
                 result[name] = Class(outlets: outlets + (existing?.outlets ?? []),
                                               actions: actions + (existing?.actions ?? []),
                                               inherited: inherited + (existing?.inherited ?? []))
             }
         }
-    }
-
-    private func violation(for name: String, file: File, offset: Int64) -> Violation {
-        let fileOffset = getLineColumnNumber(of: file, offset: Int(offset))
-        var url: URL?
-        if let path = file.path {
-            url = URL(string: path)
-        }
-        return Violation(name: name, line: fileOffset.line, column: fileOffset.column, url: url)
-    }
-
-    private func getLineColumnNumber(of file: File, offset: Int) -> (line: Int, column: Int) {
-        let range = file.contents.startIndex..<file.contents.index(file.contents.startIndex, offsetBy: offset)
-        let subString = file.contents.substring(with: range)
-        let lines = subString.components(separatedBy: "\n")
-
-        if let column = lines.last?.characters.count {
-            return (line: lines.count, column: column)
-        }
-        return (line: lines.count, column: 0)
     }
 
     private func extractedInheritedTypes(structure: [String : SourceKitRepresentable]) -> [String] {
@@ -118,5 +98,13 @@ private extension Dictionary where Key: ExpressibleByStringLiteral {
     var substructure: [[String: SourceKitRepresentable]] {
         let substructure = self["key.substructure"] as? [SourceKitRepresentable] ?? []
         return substructure.flatMap { $0 as? [String: SourceKitRepresentable] }
+    }
+
+    var isOptional: Bool {
+        if let typename = self["key.typename"] as? String,
+            let optionalString = typename.characters.last {
+            return optionalString == "?"
+        }
+        return false
     }
 }

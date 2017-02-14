@@ -31,6 +31,7 @@ if !isInUnitTests {
         print("Analyzing files located at: \(url.path)")
 
         let runner = Runner(path: url.path)
+        Configuration.shared.setup(with: args)
         let issues = try runner.issues(using: [ConnectionAnalyzer()])
         for issue in issues {
             print(issue)

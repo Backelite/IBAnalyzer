@@ -43,7 +43,7 @@ func uiKitClassNameToClass() -> [String: Class] {
     for (name, outlets) in uiKitOutlets {
         var outletArray: [Violation] = []
         for outlet in outlets {
-            outletArray.append(Violation(name: outlet, line: 0, column: 0, url:nil))
+            outletArray.append(Violation(name: outlet, line: 0, column: 0))
         }
         dict[name] = Class(outlets: outletArray, actions: [], inherited: [])
     }

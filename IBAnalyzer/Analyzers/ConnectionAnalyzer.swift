@@ -7,12 +7,31 @@
 //
 
 import Foundation
+import SourceKittenFramework
 
 struct Violation {
     var name: String
     var line: Int
     var column: Int
     var url: URL?
+    var isOptional: Bool
+
+    init(name: String, line: Int, column: Int, url: URL? = nil, isOptional: Bool = false) {
+        self.name = name
+        self.line = line
+        self.column = column
+        self.url = url
+        self.isOptional = isOptional
+    }
+
+    init(name: String, file: File, offset: Int64, isOptional: Bool = false) {
+        let fileOffset = Violation.getLineColumnNumber(of: file, offset: Int(offset))
+        var url: URL?
+        if let path = file.path {
+            url = URL(string: path)
+        }
+        self.init(name: name, line: fileOffset.line, column: fileOffset.column, url: url, isOptional: isOptional)
+    }
 
     var description: String {
         return filePath+":\(line):\(column)"
@@ -30,6 +49,17 @@ struct Violation {
             return filename
         }
         return className
+    }
+
+    private static func getLineColumnNumber(of file: File, offset: Int) -> (line: Int, column: Int) {
+        let range = file.contents.startIndex..<file.contents.index(file.contents.startIndex, offsetBy: offset)
+        let subString = file.contents.substring(with: range)
+        let lines = subString.components(separatedBy: "\n")
+        
+        if let column = lines.last?.characters.count {
+            return (line: lines.count, column: column)
+        }
+        return (line: lines.count, column: 0)
     }
 }
 
@@ -52,10 +82,40 @@ enum ConnectionIssue: Issue {
         case let .MissingAction(className: className, action: action):
             return "\(action.description): warning: IBAction missing: \(action.name) is not implemented in \(action.fileName(className: className))"
         case let .UnnecessaryOutlet(className: className, outlet: outlet):
-            return "\(outlet.description): warning: IBOutlet unused: \(outlet.name) not linked in \(outlet.fileName(className: className))"
+            if Configuration.shared.isEnabled(.ignoreOptionalProperty) && outlet.isOptional {
+                return ""
+            }
+            let removeSuggestion = outlet.isOptional ? " remove warning by adding '\(Rule.ignoreOptionalProperty.rawValue)' argument" : ""
+            return "\(outlet.description): warning: IBOutlet unused: \(outlet.name) not linked in \(outlet.fileName(className: className))"+removeSuggestion
         case let .UnnecessaryAction(className: className, action: action):
             return "\(action.description): warning: IBAction unused: \(action.name) not linked in \(action.fileName(className: className))"
         }
+    }
+}
+
+enum Rule: String {
+    case ignoreOptionalProperty //track optional properties
+}
+
+class Configuration {
+
+    static let shared = Configuration()
+
+    var configuration: [Rule: Bool] =
+        [.ignoreOptionalProperty: false]
+
+    private init() { }
+
+    func setup(with arguments: [String]) {
+        for argument in arguments {
+            if let rule = Rule(rawValue: argument) {
+                self.configuration[rule] = true
+            }
+        }
+    }
+
+    func isEnabled(_ rule: Rule) -> Bool {
+        return configuration[rule] ?? false
     }
 }
 
