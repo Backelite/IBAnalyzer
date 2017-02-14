@@ -55,7 +55,7 @@ struct Violation {
         let range = file.contents.startIndex..<file.contents.index(file.contents.startIndex, offsetBy: offset)
         let subString = file.contents.substring(with: range)
         let lines = subString.components(separatedBy: "\n")
-        
+
         if let column = lines.last?.characters.count {
             return (line: lines.count, column: column)
         }
