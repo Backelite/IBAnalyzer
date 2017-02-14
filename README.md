@@ -69,7 +69,7 @@ $ bin/ibanalyzer /path/to/your/project
 1. Move binaries ibanalyzer and IBAnalyzer.app to /usr/local/bin/ `cp bin/* /usr/local/bin/`
 1. Build Phases > New Run Script Phases
 1. Copy/Paste following to Run Script
-`
+```
 if [ "${CONFIGURATION}" = "Analyze" ]; then
     if which ibanalyzer >/dev/null; then
         ibanalyzer
@@ -77,7 +77,7 @@ if [ "${CONFIGURATION}" = "Analyze" ]; then
         echo "warning: SwiftLint not installed, download from https://github.com/fastred/IBAnalyzer"
     fi
 fi
-`
+```
 1. Product > Analyze
 
 ## Attributions
