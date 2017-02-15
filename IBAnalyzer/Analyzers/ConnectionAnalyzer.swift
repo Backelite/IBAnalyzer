@@ -78,17 +78,28 @@ enum ConnectionIssue: Issue {
     var description: String {
         switch self {
         case let .MissingOutlet(className: className, outlet: outlet):
-            return "\(outlet.description): warning: IBOutlet missing: \(outlet.name) is not implemented in \(outlet.fileName(className: className))"
+            return "\(outlet.description): error: IBOutlet missing: \(outlet.name) is not implemented in \(outlet.fileName(className: className))"
         case let .MissingAction(className: className, action: action):
-            return "\(action.description): warning: IBAction missing: \(action.name) is not implemented in \(action.fileName(className: className))"
+            return "\(action.description): error: IBAction missing: \(action.name) is not implemented in \(action.fileName(className: className))"
         case let .UnnecessaryOutlet(className: className, outlet: outlet):
             if Configuration.shared.isEnabled(.ignoreOptionalProperty) && outlet.isOptional {
                 return ""
             }
-            let removeSuggestion = outlet.isOptional ? " remove warning by adding '\(Rule.ignoreOptionalProperty.rawValue)' argument" : ""
-            return "\(outlet.description): warning: IBOutlet unused: \(outlet.name) not linked in \(outlet.fileName(className: className))"+removeSuggestion
+            let suggestion = outlet.isOptional ?
+                ", remove warning by adding '\(Rule.ignoreOptionalProperty.rawValue)' argument" :
+                ", consider set '\(outlet.name)' Optional"
+            return "\(outlet.description): warning: IBOutlet unused: \(outlet.name) not linked in \(outlet.fileName(className: className))"+suggestion
         case let .UnnecessaryAction(className: className, action: action):
             return "\(action.description): warning: IBAction unused: \(action.name) not linked in \(action.fileName(className: className))"
+        }
+    }
+
+    var isSeriousViolation: Bool {
+        switch self {
+        case .MissingOutlet(className: _, outlet: _), .MissingAction(className: _, action: _):
+            return true
+        default:
+            return false
         }
     }
 }
