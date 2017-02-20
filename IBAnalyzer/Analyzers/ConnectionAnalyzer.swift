@@ -25,7 +25,7 @@ struct Declaration {
     }
 
     init(name: String, file: File, offset: Int64, isOptional: Bool = false) {
-        let fileOffset = Violation.getLineColumnNumber(of: file, offset: Int(offset))
+        let fileOffset = type(of: self).getLineColumnNumber(of: file, offset: Int(offset))
         var url: URL?
         if let path = file.path {
             url = URL(fileURLWithPath: path)
