@@ -58,7 +58,7 @@ private class ParserDelegate: NSObject, XMLParserDelegate {
                     break
             }
 
-            let outlet = Violation(name: property, line: parser.lineNumber, column: parser.columnNumber, url: url)
+            let outlet = Declaration(name: property, line: parser.lineNumber, column: parser.columnNumber, url: url)
             classNameToNibMap[customClassName]?.outlets.append(outlet)
         case "action" where inConnections:
             guard let selector = attributeDict["selector"],
@@ -66,7 +66,7 @@ private class ParserDelegate: NSObject, XMLParserDelegate {
                 let customClassName = idToCustomClassMap[destination] else {
                     break
             }
-            let action = Violation(name: selector, line: parser.lineNumber, column: parser.columnNumber, url: url)
+            let action = Declaration(name: selector, line: parser.lineNumber, column: parser.columnNumber, url: url)
             classNameToNibMap[customClassName]?.actions.append(action)
         case let tag where (inObjects && tag != "viewControllerPlaceholder"):
             let customClass = attributeDict["customClass"]

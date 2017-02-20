@@ -42,8 +42,8 @@ class SwiftParser: SwiftParserType {
                                    result: inout [String: Class],
                                    file: File) {
         for structure in substructure {
-            var outlets: [Violation] = []
-            var actions: [Violation] = []
+            var outlets: [Declaration] = []
+            var actions: [Declaration] = []
 
             if let kind = structure["key.kind"] as? String,
                 let name = structure["key.name"] as? String,
@@ -58,7 +58,7 @@ class SwiftParser: SwiftParserType {
                         }).count > 0
 
                         if isOutlet, let nameOffset64 = insideStructure["key.nameoffset"] as? Int64 {
-                            outlets.append(Violation(name: propertyName, file: file, offset: nameOffset64, isOptional: insideStructure.isOptional))
+                            outlets.append(Declaration(name: propertyName, file: file, offset: nameOffset64, isOptional: insideStructure.isOptional))
                         }
 
                         let isIBAction = attributes.filter({ (dict) -> Bool in
@@ -67,7 +67,7 @@ class SwiftParser: SwiftParserType {
 
                         if isIBAction, let selectorName = insideStructure["key.selector_name"] as? String,
                             let nameOffset64 = insideStructure["key.nameoffset"] as? Int64 {
-                            actions.append(Violation(name: selectorName, file: file, offset: nameOffset64))
+                            actions.append(Declaration(name: selectorName, file: file, offset: nameOffset64))
                         }
                     }
                 }

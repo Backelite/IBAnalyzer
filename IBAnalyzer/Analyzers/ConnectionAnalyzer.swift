@@ -9,7 +9,7 @@
 import Foundation
 import SourceKittenFramework
 
-struct Violation {
+struct Declaration {
     var name: String
     var line: Int
     var column: Int
@@ -63,17 +63,17 @@ struct Violation {
     }
 }
 
-extension Violation: Equatable {
-    public static func == (lhs: Violation, rhs: Violation) -> Bool {
+extension Declaration: Equatable {
+    public static func == (lhs: Declaration, rhs: Declaration) -> Bool {
         return lhs.name == rhs.name
     }
 }
 
 enum ConnectionIssue: Issue {
-    case MissingOutlet(className: String, outlet: Violation)
-    case MissingAction(className: String, action: Violation)
-    case UnnecessaryOutlet(className: String, outlet: Violation)
-    case UnnecessaryAction(className: String, action: Violation)
+    case MissingOutlet(className: String, outlet: Declaration)
+    case MissingAction(className: String, action: Declaration)
+    case UnnecessaryOutlet(className: String, outlet: Declaration)
+    case UnnecessaryAction(className: String, action: Declaration)
 
     var description: String {
         switch self {
