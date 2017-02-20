@@ -54,10 +54,8 @@ struct StubSwiftParser: SwiftParserType {
         switch url {
         case URL(fileURLWithPath: "a.swift"):
             result += type(of: self).aMap
-            //return type(of: self).aMap
         case URL(fileURLWithPath: "e.swift"):
             result += type(of: self).eMap
-            //return type(of: self).eMap
         default:
             fatalError()
         }
