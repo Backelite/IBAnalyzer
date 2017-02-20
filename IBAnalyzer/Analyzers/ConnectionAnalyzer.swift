@@ -28,7 +28,7 @@ struct Declaration {
         let fileOffset = Violation.getLineColumnNumber(of: file, offset: Int(offset))
         var url: URL?
         if let path = file.path {
-            url = URL(string: path)
+            url = URL(fileURLWithPath: path)
         }
         self.init(name: name, line: fileOffset.line, column: fileOffset.column, url: url, isOptional: isOptional)
     }
