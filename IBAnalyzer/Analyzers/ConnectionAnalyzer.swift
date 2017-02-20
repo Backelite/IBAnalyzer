@@ -96,7 +96,7 @@ enum ConnectionIssue: Issue {
 
     var isSeriousViolation: Bool {
         switch self {
-        case .MissingOutlet(className: _, outlet: _), .MissingAction(className: _, action: _):
+        case .MissingOutlet, .MissingAction:
             return true
         default:
             return false
